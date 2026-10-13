@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Electrical Spare Parts Management System</title>
+<style>
+:root{--navy:#0e2545;--navy2:#16375f;--acc:#2563eb;--acc2:#1d4ed8;--bg:#f3f5f9;--pnl:#fff;--ln:#dde3ed;--ln2:#eef1f6;--tx:#16233a;--mut:#6b7a90;--grn:#0f7a53;--grnb:#e6f6ef;--amb:#9a6108;--ambb:#fdf3e0;--red:#b3261e;--redb:#fdeceb;--blub:#e8f0fe;--rad:10px;--shd:0 1px 2px rgba(16,32,58,.06),0 6px 18px rgba(16,32,58,.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",Roboto,system-ui,-apple-system,Arial,sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.45}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+.muted{color:var(--mut)}.req{color:var(--red)}
+.app{display:flex;min-height:100vh}
+.sb{width:250px;flex:0 0 250px;background:linear-gradient(180deg,var(--navy),var(--navy2));color:#d7e3f5;display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;z-index:60;box-shadow:2px 0 12px rgba(10,25,50,.12)}
+.brand{display:flex;align-items:center;gap:11px;padding:18px;border-bottom:1px solid rgba(255,255,255,.09)}
+.blg{width:40px;height:40px;border-radius:9px;flex:0 0 40px;background:linear-gradient(135deg,#2f7cf6,#1a4fb0);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#fff}
+.brand strong{display:block;font-size:15px;color:#fff}.brand span{display:block;font-size:11px;color:#93a9c8;text-transform:uppercase;letter-spacing:.7px}
+.nav{padding:12px 10px;display:flex;flex-direction:column;gap:3px;overflow-y:auto;flex:1}
+.nav-item{display:flex;align-items:center;gap:11px;width:100%;padding:10px 12px;border:0;border-radius:8px;background:transparent;color:#c3d3ea;cursor:pointer;text-align:left;font-size:13.5px;font-weight:500;transition:.15s}
+.nav-item svg{width:19px;height:19px;flex:0 0 19px;opacity:.9}
+.nav-item:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-item.active{background:linear-gradient(90deg,rgba(47,124,246,.95),rgba(37,99,235,.75));color:#fff}
+.nbadge{margin-left:auto;background:#e5484d;color:#fff;font-size:11px;font-weight:700;border-radius:20px;padding:1px 7px;min-width:20px;text-align:center}
+.nbadge.hide{display:none}
+.sbfoot{padding:12px 16px 16px;border-top:1px solid rgba(255,255,255,.09);font-size:11px;line-height:1.5;color:#8fa5c4}
+.sbfoot b{color:#c9d9ef}
+.main{flex:1;margin-left:250px;min-width:0;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--ln);display:flex;align-items:center;gap:12px;padding:0 20px;height:60px}
+.mbtn{display:none;background:#f1f4fa;border:1px solid var(--ln);border-radius:8px;width:38px;height:38px;font-size:17px;cursor:pointer;color:var(--navy)}
+.ttl{font-size:16px;font-weight:650;color:var(--navy)}
+.tright{margin-left:auto;display:flex;gap:10px;align-items:center}
+.chip{font-size:12px;font-weight:600;padding:5px 11px;border-radius:20px;background:#eef2f8;color:var(--mut);border:1px solid var(--ln);white-space:nowrap}
+.chip.ok{background:var(--grnb);color:var(--grn);border-color:#bfe6d5}
+.chip.err{background:var(--redb);color:var(--red);border-color:#f5c5c2}
+.content{padding:22px;max-width:1600px;width:100%}
+.view{display:none}.view.active{display:block}
+.ph{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
+.ph h1{font-size:21px;color:var(--navy)}.ph p{font-size:13px;margin-top:2px}
+.pactions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 15px;border-radius:8px;border:1px solid transparent;cursor:pointer;font-size:13px;font-weight:600;transition:.15s;white-space:nowrap}
+.btn.primary{background:var(--acc);color:#fff;box-shadow:0 2px 6px rgba(37,99,235,.28)}
+.btn.primary:hover{background:var(--acc2)}
+.btn.ghost{background:#fff;color:var(--navy);border-color:var(--ln)}
+.btn.ghost:hover{background:#f4f7fc}
+.btn.danger{background:#c0392b;color:#fff}.btn.danger:hover{background:#a5301f}
+.btn.tiny{padding:5px 10px;font-size:12px}
+.pnl{background:var(--pnl);border:1px solid var(--ln);border-radius:var(--rad);box-shadow:var(--shd);margin-bottom:18px;overflow:hidden}
+.phead{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--ln2);flex-wrap:wrap}
+.phead h3{font-size:14.5px;color:var(--navy)}.pbody{padding:18px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.g21{display:grid;grid-template-columns:1.45fr 1fr;gap:18px;align-items:start}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:15px;margin-bottom:20px}
+.stat{background:#fff;border:1px solid var(--ln);border-radius:var(--rad);padding:16px;display:flex;gap:13px;align-items:flex-start;box-shadow:var(--shd);transition:.15s}
+.stat:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(16,32,58,.10)}
+.sic{width:42px;height:42px;flex:0 0 42px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.sic svg{width:21px;height:21px}
+.slbl{font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--mut);font-weight:650}
+.sval{font-size:22px;font-weight:700;color:var(--navy);margin:3px 0 1px;line-height:1.15}
+.ssub{font-size:11.5px;color:var(--mut)}
+.t-blue .sic{background:var(--blub);color:#1d4ed8}
+.t-green .sic{background:var(--grnb);color:var(--grn)}
+.t-amber .sic{background:var(--ambb);color:var(--amb)}
+.t-red .sic{background:var(--redb);color:var(--red)}
+.t-navy .sic{background:#e9edf5;color:var(--navy)}
+.t-teal .sic{background:#e2f5f7;color:#0d7c88}
+.t-purple .sic{background:#f0e9fb;color:#6d3fc0}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg .sp2{grid-column:1/-1}
+.fld{display:flex;flex-direction:column;gap:5px;min-width:0}
+.fld label{font-size:12px;font-weight:650;color:#3d4c63}
+input[type=text],input[type=number],input[type=date],input[type=search],select,textarea{width:100%;padding:9px 11px;border:1px solid var(--ln);border-radius:8px;background:#fff;outline:none;transition:.15s;font-size:13.5px}
+input:focus,select:focus,textarea:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(37,99,235,.13)}
+textarea{resize:vertical;min-height:54px}
+select{cursor:pointer;appearance:none;background-image:linear-gradient(45deg,transparent 50%,#7b8aa0 50%),linear-gradient(135deg,#7b8aa0 50%,transparent 50%);background-position:calc(100% - 16px) 50%,calc(100% - 11px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:32px}
+.chk{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#3d4c63;font-weight:600}
+.chk input{width:16px;height:16px;accent-color:var(--acc);cursor:pointer}
+.fact{display:flex;gap:10px;margin-top:4px;flex-wrap:wrap}
+.hint{font-size:12px;color:var(--mut)}
+.tbar{display:grid;grid-template-columns:1.6fr 1fr 1fr auto;gap:10px;padding:14px 18px;border-bottom:1px solid var(--ln2);background:#fafbfd}
+.tbar.txn{grid-template-columns:repeat(5,minmax(0,1fr)) auto}
+.tw{overflow-x:auto}
+table.data{width:100%;border-collapse:collapse;font-size:13px;min-width:900px}
+table.data thead th{position:sticky;top:0;background:#f2f5fa;color:#38475e;text-align:left;font-weight:650;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;padding:11px 12px;border-bottom:1px solid var(--ln);white-space:nowrap}
+table.data thead th.sortable{cursor:pointer;user-select:none}
+table.data thead th.sortable:hover{background:#e8eef8;color:var(--navy)}
+table.data tbody td{padding:10px 12px;border-bottom:1px solid var(--ln2);vertical-align:middle}
+table.data tbody tr:hover{background:#f7faff}
+table.data tbody tr.rlow{background:#fffaf0}
+table.data tbody tr.rout{background:#fef4f3}
+.cs{font-weight:650;color:var(--navy)}
+.cc{font-family:Consolas,"Courier New",monospace;font-size:12.5px;color:#33507a;font-weight:600}
+.tfoot{padding:10px 18px;font-size:12.5px;color:var(--mut);border-top:1px solid var(--ln2);background:#fafbfd}
+.bdg{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.bdg.ok{background:var(--grnb);color:var(--grn)}.bdg.low{background:var(--ambb);color:var(--amb)}
+.bdg.out{background:var(--redb);color:var(--red)}.bdg.in{background:var(--blub);color:#1d4ed8}
+.bdg.outt{background:#fdeceb;color:var(--red)}.bdg.demo{background:#eef1f6;color:#5a6b83}
+.racts{display:flex;gap:6px;flex-wrap:nowrap}
+.ibtn{border:1px solid var(--ln);background:#fff;border-radius:7px;padding:5px 9px;font-size:11.5px;font-weight:650;cursor:pointer;color:var(--navy);transition:.15s}
+.ibtn:hover{background:#eef4ff;border-color:#b9cdf0}
+.ibtn.del:hover{background:var(--redb);border-color:#f0c3bf;color:var(--red)}
+.empty{padding:34px 18px;text-align:center;color:var(--mut);font-size:13px}
+.empty strong{display:block;color:var(--navy);font-size:14px;margin-bottom:4px}
+#toasts{position:fixed;right:18px;bottom:18px;z-index:200;display:flex;flex-direction:column;gap:9px;max-width:min(360px,92vw)}
+.toast{background:#132b4c;color:#fff;padding:12px 15px;border-radius:9px;font-size:13px;font-weight:550;box-shadow:0 8px 26px rgba(10,25,50,.30);border-left:4px solid #2f7cf6;animation:sl .22s ease;word-break:break-word}
+.toast.success{border-left-color:#22c07d}.toast.error{border-left-color:#e5484d}
+.toast.out{opacity:0;transform:translateX(16px);transition:.28s}
+@keyframes sl{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:none}}
+.mbck{position:fixed;inset:0;background:rgba(11,26,48,.55);z-index:150;display:none;align-items:flex-start;justify-content:center;padding:28px 14px;overflow-y:auto;backdrop-filter:blur(2px)}
+.mbck.show{display:flex}
+.modal{background:#fff;border-radius:12px;width:100%;max-width:620px;box-shadow:0 20px 60px rgba(8,20,40,.35);margin:auto}
+.modal.wide{max-width:860px}
+.mhd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--ln2)}
+.mhd h3{font-size:15.5px;color:var(--navy)}
+.mcl{background:none;border:0;font-size:22px;line-height:1;color:var(--mut);cursor:pointer;padding:0 4px;border-radius:6px}
+.mcl:hover{color:var(--red)}
+.mbd{padding:20px}
+.mft{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--ln2);background:#fafbfd;border-radius:0 0 12px 12px}
+.cmsg{font-size:13.5px;color:#3d4c63;line-height:1.6;white-space:pre-line}
+body.modal-open{overflow:hidden}
+.dg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--ln);border-radius:9px;overflow:hidden}
+.di{padding:10px 13px;border-bottom:1px solid var(--ln2);background:#fff}
+.di:nth-child(odd){background:#fafbfd}
+.di .k{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);font-weight:650}
+.di .v{font-size:13.5px;color:var(--tx);font-weight:550;word-break:break-word;margin-top:2px}
+.stitle{font-size:13px;font-weight:700;color:var(--navy);margin:18px 0 9px;text-transform:uppercase;letter-spacing:.5px}
+.arow{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--ln2)}
+.arow:last-child{border-bottom:0}
+.adot{width:9px;height:9px;border-radius:50%;flex:0 0 9px}
+.adot.low{background:#e0a020}.adot.out{background:#d64545}
+.amain{flex:1;min-width:0}
+.amain .t{font-size:13px;font-weight:650;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.amain .s{font-size:11.5px;color:var(--mut)}
+.aqty{font-size:12.5px;font-weight:700;white-space:nowrap}
+.rc{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px}
+.rc label{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:650;color:#3d4c63}
+.rbtns{display:flex;gap:9px;flex-wrap:wrap}
+table.rt{width:100%;border-collapse:collapse;font-size:12.5px;min-width:640px}
+table.rt th{background:#f2f5fa;text-align:left;padding:9px 10px;border-bottom:1px solid var(--ln);font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:#38475e;white-space:nowrap}
+table.rt td{padding:8px 10px;border-bottom:1px solid var(--ln2);vertical-align:top}
+table.rt tfoot td{background:#f2f5fa;font-weight:700;border-top:1px solid var(--ln);color:var(--navy)}
+.rsum{display:flex;gap:22px;flex-wrap:wrap;padding:12px 14px;background:#f7f9fd;border:1px solid var(--ln);border-radius:9px;margin-bottom:14px}
+.rsum div{font-size:12.5px;color:var(--mut)}
+.rsum b{display:block;font-size:16px;color:var(--navy);font-weight:700}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.dcard{background:#fff;border:1px solid var(--ln);border-radius:var(--rad);padding:18px;box-shadow:var(--shd)}
+.dcard h4{font-size:14px;color:var(--navy);margin-bottom:6px}
+.dcard p{font-size:12.5px;color:var(--mut);margin-bottom:13px;line-height:1.55}
+.wbox{background:var(--ambb);border:1px solid #f0d9a8;color:#7a4c05;border-radius:9px;padding:13px 15px;font-size:12.5px;line-height:1.6;margin-bottom:18px}
+.wbox b{color:#613c03}
+.finput{display:block;width:100%;font-size:12.5px}
+#printRoot{display:none}
+@media (max-width:1180px){.g2,.g21{grid-template-columns:1fr}}
+@media (max-width:960px){
+.sb{transform:translateX(-100%);transition:transform .24s ease}.sb.open{transform:none}
+.main{margin-left:0}.mbtn{display:inline-flex;align-items:center;justify-content:center}
+.tbar,.tbar.txn{grid-template-columns:1fr 1fr}.content{padding:16px}
+.sbck{position:fixed;inset:0;background:rgba(11,26,48,.45);z-index:55;display:none}.sbck.show{display:block}
+}
+@media (max-width:640px){
+.fg,.tbar,.tbar.txn,.dg,.cards{grid-template-columns:1fr}
+.ph h1{font-size:18px}.topbar{padding:0 12px}.ttl{font-size:14px}.chip{font-size:11px;padding:4px 9px}
+}
+@media print{
+@page{size:A4;margin:12mm}
+body{background:#fff;font-size:11px}
+.app,#toasts,.mbck{display:none!important}
+#printRoot{display:block!important}
+#printRoot h1{font-size:17px;margin-bottom:2px;color:#0e2545}
+.print-sub{font-size:11px;color:#444;margin-bottom:2px}
+.print-meta{font-size:10px;color:#666;margin-bottom:12px;padding-bottom:8px;border-bottom:1.5px solid #0e2545}
+#printRoot table{width:100%;border-collapse:collapse;font-size:10px;margin-top:8px}
+#printRoot thead{display:table-header-group}
+#printRoot th{background:#eef1f6!important;border:1px solid #9aa6b8;padding:4px 5px;text-align:left;font-size:9.5px;text-transform:uppercase}
+#printRoot td{border:1px solid #9aa6b8;padding:4px 5px;vertical-align:top}
+#printRoot tfoot td{background:#eef1f6!important;font-weight:700}
+#printRoot .print-summary{margin:8px 0;font-size:10.5px}
+tr{page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sb" id="sb">
+<div class="brand"><div class="blg">ES</div><div><strong>Spare Parts</strong><span>Electrical Maint.</span></div></div>
+<nav class="nav">
+<button class="nav-item active" data-v="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</button>
+<button class="nav-item" data-v="inventory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>Inventory</button>
+<button class="nav-item" data-v="stockin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v10M8 9l4 4 4-4M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>Stock In</button>
+<button class="nav-item" data-v="stockout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 14V4M8 8l4-4 4 4M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>Stock Out</button>
+<button class="nav-item" data-v="transactions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>Transactions</button>
+<button class="nav-item" data-v="alerts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>Low Stock Alerts<span class="nbadge hide" id="nbadge">0</span></button>
+<button class="nav-item" data-v="reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="5" width="3" height="13"/></svg>Reports</button>
+<button class="nav-item" data-v="data"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>Data &amp; Backup</button>
+</nav>
+<div class="sbfoot"><b>Local storage only.</b> Records are saved in this browser on this computer. Clearing browser data will erase them — keep regular JSON backups.</div>
+</aside>
+<div class="sbck" id="sbck"></div>
+
+<div class="main">
+<header class="topbar">
+<button class="mbtn" id="mbtn">☰</button>
+<div class="ttl" id="ptitle">Dashboard</div>
+<div class="tright"><span class="chip" id="chip">Ready</span></div>
+</header>
+<main class="content">
+
+<!-- DASHBOARD -->
+<section id="v-dashboard" class="view active">
+<div class="ph"><div><h1>Dashboard</h1><p class="muted">Live overview of the electrical spare parts store</p></div>
+<div class="pactions"><button class="btn ghost" id="dashPrint">Print Summary</button></div></div>
+<div class="cards" id="dashCards"></div>
+<div class="g2">
+<div class="pnl"><div class="phead"><h3>Low Stock &amp; Out of Stock Alerts</h3><button class="btn tiny ghost" data-goto="alerts">View all</button></div><div id="dashAlerts"></div></div>
+<div class="pnl"><div class="phead"><h3>Recent Transactions</h3><button class="btn tiny ghost" data-goto="transactions">View all</button></div><div id="dashRecent"></div></div>
+</div>
+</section>
+
+<!-- INVENTORY -->
+<section id="v-inventory" class="view">
+<div class="ph"><div><h1>Spare Parts Inventory</h1><p class="muted">Add, edit, search and manage all electrical spare parts</p></div>
+<div class="pactions">
+<button class="btn primary" id="addPart">+ Add New Part</button>
+<button class="btn ghost" id="expInv">Export CSV</button>
+<button class="btn ghost" id="prtInv">Print</button></div></div>
+<div class="pnl">
+<div class="tbar">
+<input id="invSearch" type="search" placeholder="Search name, code, model, brand, category or location…">
+<select id="invCat"><option value="">All categories</option></select>
+<select id="invStat"><option value="">All stock status</option><option value="in">In stock</option><option value="low">Low stock</option><option value="out">Out of stock</option></select>
+<button class="btn ghost" id="invReset">Reset</button>
+</div>
+<div class="tw"><table class="data" id="invTable"></table></div>
+<div class="tfoot" id="invFoot"></div>
+</div>
+</section>
+
+<!-- STOCK IN -->
+<section id="v-stockin" class="view">
+<div class="ph"><div><h1>Stock In / Receive</h1><p class="muted">Record spare parts received into the store</p></div></div>
+<div class="g21">
+<div class="pnl"><div class="phead"><h3>Receive Stock</h3></div>
+<form id="inForm" class="pbody fg" autocomplete="off">
+<div class="fld sp2"><label>Spare Part <span class="req">*</span></label><select id="inPart" required></select><span class="hint" id="inHint">Select the item being received.</span></div>
+<div class="fld"><label>Receive Date <span class="req">*</span></label><input type="date" id="inDate" required></div>
+<div class="fld"><label>Received Quantity <span class="req">*</span></label><input type="number" id="inQty" min="0.001" step="0.001" required></div>
+<div class="fld"><label>Unit Purchase Price (৳)</label><input type="number" id="inPrice" min="0" step="0.01"></div>
+<div class="fld"><label>Supplier Name</label><input type="text" id="inSup" maxlength="80"></div>
+<div class="fld"><label>Invoice / Challan No.</label><input type="text" id="inInv" maxlength="60"></div>
+<div class="fld"><label>Received By</label><input type="text" id="inBy" maxlength="60"></div>
+<div class="fld sp2"><label>Remarks</label><textarea id="inRem" rows="2" maxlength="300"></textarea></div>
+<div class="fld sp2"><label class="chk"><input type="checkbox" id="inUpd" checked> Update the item's unit purchase price with this value</label></div>
+<div class="fact sp2"><button type="submit" class="btn primary">Save Receipt</button><button type="reset" class="btn ghost">Clear Form</button></div>
+</form></div>
+<div class="pnl"><div class="phead"><h3>Recent Receipts</h3></div><div id="recIn"></div></div>
+</div>
+</section>
+
+<!-- STOCK OUT -->
+<section id="v-stockout" class="view">
+<div class="ph"><div><h1>Stock Out / Issue</h1><p class="muted">Issue spare parts to departments and machines</p></div></div>
+<div class="g21">
+<div class="pnl"><div class="phead"><h3>Issue Stock</h3></div>
+<form id="outForm" class="pbody fg" autocomplete="off">
+<div class="fld sp2"><label>Spare Part <span class="req">*</span></label><select id="outPart" required></select><span class="hint" id="outHint">Select the item being issued.</span></div>
+<div class="fld"><label>Issue Date <span class="req">*</span></label><input type="date" id="outDate" required></div>
+<div class="fld"><label>Issue Quantity <span class="req">*</span></label><input type="number" id="outQty" min="0.001" step="0.001" required></div>
+<div class="fld"><label>Department / Machine</label><input type="text" id="outDept" maxlength="80"></div>
+<div class="fld"><label>Issued To</label><input type="text" id="outTo" maxlength="60"></div>
+<div class="fld"><label>Requisition No.</label><input type="text" id="outReq" maxlength="60"></div>
+<div class="fld"><label>Approved By</label><input type="text" id="outApp" maxlength="60"></div>
+<div class="fld"><label>Issued By</label><input type="text" id="outBy" maxlength="60"></div>
+<div class="fld sp2"><label>Remarks</label><textarea id="outRem" rows="2" maxlength="300"></textarea></div>
+<div class="fact sp2"><button type="submit" class="btn primary">Save Issue</button><button type="reset" class="btn ghost">Clear Form</button></div>
+</form></div>
+<div class="pnl"><div class="phead"><h3>Recent Issues</h3></div><div id="recOut"></div></div>
+</div>
+</section>
+
+<!-- TRANSACTIONS -->
+<section id="v-transactions" class="view">
+<div class="ph"><div><h1>Transaction History</h1><p class="muted">Complete record of all stock receipts and issues</p></div>
+<div class="pactions"><button class="btn ghost" id="txnExp">Export CSV</button><button class="btn ghost" id="txnPrt">Print</button></div></div>
+<div class="pnl">
+<div class="tbar txn">
+<input type="date" id="txnFrom" title="From">
+<input type="date" id="txnTo" title="To">
+<select id="txnType"><option value="">All types</option><option value="IN">Stock In</option><option value="OUT">Stock Out</option></select>
+<input type="search" id="txnItem" placeholder="Item name / code">
+<input type="search" id="txnDept" placeholder="Department / machine">
+<button class="btn ghost" id="txnReset">Reset</button>
+</div>
+<div class="tw"><table class="data" id="txnTable"></table></div>
+<div class="tfoot" id="txnFoot"></div>
+</div>
+</section>
+
+<!-- ALERTS -->
+<section id="v-alerts" class="view">
+<div class="ph"><div><h1>Low Stock Alerts</h1><p class="muted">Items at or below reorder level and items out of stock</p></div>
+<div class="pactions"><button class="btn ghost" id="alPrt">Print Report</button><button class="btn ghost" id="alCsv">Export CSV</button></div></div>
+<div class="cards" id="alCards"></div>
+<div class="pnl"><div class="phead"><h3>Items Requiring Attention</h3></div>
+<div class="tw"><table class="data" id="alTable"></table></div>
+<div class="tfoot" id="alFoot"></div></div>
+</section>
+
+<!-- REPORTS -->
+<section id="v-reports" class="view">
+<div class="ph"><div><h1>Reports</h1><p class="muted">Generate, print and export professional reports</p></div></div>
+<div class="pnl"><div class="pbody">
+<div class="rc">
+<label>From Date <input type="date" id="repFrom"></label>
+<label>To Date <input type="date" id="repTo"></label>
+<button class="btn ghost" id="repMonth">This Month</button>
+<button class="btn ghost" id="repAll">All Time</button>
+</div>
+<div class="rbtns">
+<button class="btn primary" data-rep="current">Current Stock Report</button>
+<button class="btn primary" data-rep="in">Stock In Report</button>
+<button class="btn primary" data-rep="out">Stock Out Report</button>
+<button class="btn primary" data-rep="low">Low Stock Report</button>
+<button class="btn primary" data-rep="valuation">Inventory Valuation</button>
+<button class="btn primary" data-rep="movement">Monthly Stock Movement</button>
+</div>
+</div></div>
+<div class="pnl" id="repPanel" style="display:none">
+<div class="phead"><h3 id="repTitle">Report</h3>
+<div class="pactions"><button class="btn ghost" id="repPrt">Print</button><button class="btn ghost" id="repCsv">Export CSV</button></div></div>
+<div id="repOut"></div>
+</div>
+</section>
+
+<!-- DATA -->
+<section id="v-data" class="view">
+<div class="ph"><div><h1>Data &amp; Backup</h1><p class="muted">Backup, restore and manage the local database</p></div></div>
+<div class="wbox"><b>Important:</b> All records are stored in this browser's LocalStorage on <b>this computer only</b>. Data is <b>not</b> synchronised between computers or browsers. Clearing browser history/data, using private browsing or a different browser profile will erase these records. Please download a JSON backup regularly.</div>
+<div class="cards" id="dataCards"></div>
+<div class="dgrid">
+<div class="dcard"><h4>Full JSON Backup</h4><p>Download a complete backup file containing every spare part, transaction and setting.</p><button class="btn primary" id="bkBtn">Download JSON Backup</button></div>
+<div class="dcard"><h4>Restore from Backup</h4><p>Select a previously exported JSON file. Existing data will be replaced after confirmation.</p><input type="file" id="rsFile" class="finput" accept=".json,application/json"></div>
+<div class="dcard"><h4>Export to Excel (CSV)</h4><p>Download inventory or full transaction history as CSV files for Microsoft Excel.</p><div class="pactions"><button class="btn ghost" id="csvInv">Inventory CSV</button><button class="btn ghost" id="csvTxn">Transactions CSV</button></div></div>
+<div class="dcard"><h4>Demo Data</h4><p>Load realistic sample electrical spare parts. Demo records are clearly marked and can be removed without affecting your own data.</p><div class="pactions"><button class="btn ghost" id="ldDemo">Load Demo Data</button><button class="btn ghost" id="rmDemo">Remove Demo Records</button></div></div>
+<div class="dcard"><h4>Danger Zone</h4><p>Permanently delete every spare part and transaction stored in this browser. This cannot be undone.</p><button class="btn danger" id="clrAll">Delete All Data</button></div>
+</div>
+</section>
+
+</main>
+</div>
+</div>
+
+<div class="mbck" id="mbck"><div class="modal" id="mbox" role="dialog" aria-modal="true">
+<div class="mhd"><h3 id="mtitle">Title</h3><button class="mcl" id="mcl">×</button></div>
+<div class="mbd" id="mbody"></div>
+<div class="mft" id="mfoot"></div>
+</div></div>
+<div id="toasts"></div>
+<div id="printRoot"></div>
+<datalist id="catList">
+<option value="Contactor"></option><option value="MCB"></option><option value="MCCB"></option><option value="Fuse"></option>
+<option value="Relay"></option><option value="Overload Relay"></option><option value="Power Supply"></option>
+<option value="Sensor"></option><option value="Switch"></option><option value="Push Button"></option><option value="Fan"></option>
+<option value="Motor"></option><option value="Drive / VFD"></option><option value="Cable"></option>
+<option value="Cable Accessory"></option><option value="Terminal Block"></option><option value="Indicator Lamp"></option>
+<option value="Timer"></option><option value="Meter"></option><option value="Other"></option>
+</datalist>
+
+<script>
+"use strict";
+/* ============================================================================
+   ELECTRICAL SPARE PARTS MANAGEMENT SYSTEM
+   Complete single-file app: HTML5 + CSS3 + Vanilla JS + LocalStorage
+   ============================================================================ */
+
+var K="espms_v1";
+var UNITS=["pcs","set","nos","pair","meter","roll","kg","box","litre","bundle"];
+var DB={parts:[],transactions:[],counters:{part:0,txn:0}};
+var TOT=new Map();
+var curView="dashboard";
+var F={q:"",cat:"",stat:"",sk:"id",sd:"asc"};
+var TF={from:"",to:"",type:"",item:"",dept:"",sk:"date",sd:"desc"};
+var lastRep=null;
+
+/* ---------- Utilities ---------- */
+function $(s,r){return (r||document).querySelector(s);}
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
+function esc(v){return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+function num(v){var n=parseFloat(v);return isFinite(n)?n:0;}
+function r3(n){return Math.round(n*1000)/1000;}
+function money(n){var v=Math.round(num(n)*100)/100;return "৳"+v.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});}
+function qf(n){return r3(num(n)).toLocaleString("en-US",{maximumFractionDigits:3});}
+function today(){var d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);}
+function firstMonth(){return today().slice(0,8)+"01";}
+function curMonth(){return today().slice(0,7);}
+var MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+var MNF=["January","February","March","April","May","June","July","August","September","October","November","December"];
+function pdate(iso){if(!iso)return "—";var p=String(iso).split("-");if(p.length!==3)return iso;return p[2]+" "+(MN[parseInt(p[1],10)-1]||p[1])+" "+p[0];}
+function mlabel(k){var p=String(k).split("-");return (MNF[parseInt(p[1],10)-1]||p[1])+" "+p[0];}
+function off(days){var d=new Date();d.setDate(d.getDate()+days);return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);}
+
+/* ---------- Storage ---------- */
+function load(){
+  var raw=null;
+  try{raw=localStorage.getItem(K);}catch(e){chipSet(false,"Local storage blocked");return;}
+  if(!raw)return;
+  try{
+    var p=JSON.parse(raw);
+    if(!p||typeof p!=="object")throw 0;
+    DB.parts=Array.isArray(p.parts)?p.parts.filter(function(x){return x&&typeof x==="object"&&x.id;}):[];
+    DB.transactions=Array.isArray(p.transactions)?p.transactions.filter(function(x){return x&&typeof x==="object"&&x.id;}):[];
+    DB.counters={part:p.counters?num(p.counters.part):0,txn:p.counters?num(p.counters.txn):0};
+    DB.parts.forEach(function(x){
+      x.openingStock=Math.max(0,num(x.openingStock));
+      x.minLevel=Math.max(0,num(x.minLevel));
+      x.unitPrice=Math.max(0,num(x.unitPrice));
+      x.name=String(x.name||"Unnamed item");
+      x.code=String(x.code||x.id);
+      x.unit=String(x.unit||"pcs");
+    });
+    DB.transactions.forEach(function(t){
+      t.qty=num(t.qty);t.price=num(t.price);
+      t.type=(t.type==="OUT")?"OUT":"IN";
+      t.date=String(t.date||today());
+    });
+  }catch(e){
+    try{localStorage.setItem(K+"_corrupt_"+Date.now(),raw);}catch(x){}
+    DB={parts:[],transactions:[],counters:{part:0,txn:0}};
+    setTimeout(function(){toast("Saved data was corrupted. A copy was kept and the app started empty.","error");},400);
+  }
+}
+function save(){
+  try{localStorage.setItem(K,JSON.stringify(DB));chipSet(true);return true;}
+  catch(e){chipSet(false,e&&e.message?e.message:"Storage error");toast("Could not save data. Storage may be full or blocked.","error");return false;}
+}
+var chipT=null;
+function chipSet(ok,msg){
+  var c=$("#chip");if(!c)return;clearTimeout(chipT);
+  if(ok){c.className="chip ok";c.textContent="✓ Saved to this browser";
+    chipT=setTimeout(function(){c.className="chip";c.textContent="Data saved locally";},2600);}
+  else{c.className="chip err";c.textContent="⚠ "+(msg||"Save failed");}
+}
+function fixC(){
+  var mp=0,mt=0;
+  DB.parts.forEach(function(p){var m=/^SP-(\d+)$/.exec(p.id);if(m)mp=Math.max(mp,parseInt(m[1],10));});
+  DB.transactions.forEach(function(t){var m=/-(\d+)$/.exec(t.id);if(m)mt=Math.max(mt,parseInt(m[1],10));});
+  if(DB.counters.part<mp)DB.counters.part=mp;
+  if(DB.counters.txn<mt)DB.counters.txn=mt;
+}
+function nextPid(){DB.counters.part+=1;return "SP-"+String(DB.counters.part).padStart(4,"0");}
+function nextTid(type){DB.counters.txn+=1;return (type==="IN"?"IN-":"OUT-")+String(DB.counters.txn).padStart(4,"0");}
+
+/* ---------- Calculations ---------- */
+function rebuildTotals(){
+  var m=new Map();
+  DB.transactions.forEach(function(t){
+    var e=m.get(t.partId);
+    if(!e){e={tin:0,tout:0};m.set(t.partId,e);}
+    if(t.type==="IN")e.tin+=num(t.qty);else e.tout+=num(t.qty);
+  });
+  TOT=m;
+}
+function calc(p){
+  var e=TOT.get(p.id)||{tin:0,tout:0};
+  var cur=r3(num(p.openingStock)+e.tin-e.tout);
+  var val=Math.round(cur*num(p.unitPrice)*100)/100;
+  var st="in";
+  if(cur<=0)st="out";else if(cur<=num(p.minLevel))st="low";
+  return {tin:r3(e.tin),tout:r3(e.tout),cur:cur,val:val,st:st};
+}
+function suggest(p,c){var t=num(p.minLevel)*2;var n=Math.ceil(t-c.cur);return n>0?n:1;}
+
+/* ---------- UI Helpers ---------- */
+function toast(msg,type){
+  var b=$("#toasts");
+  var e=document.createElement("div");
+  e.className="toast "+(type==="error"?"error":"success");
+  e.textContent=msg;
+  b.appendChild(e);
+  setTimeout(function(){e.classList.add("out");setTimeout(function(){e.remove();},300);},type==="error"?4600:3000);
+}
+function openModal(o){
+  $("#mtitle").textContent=o.title||"";
+  $("#mbody").innerHTML=o.body||"";
+  $("#mfoot").innerHTML=o.footer||"";
+  $("#mbox").classList.toggle("wide",!!o.wide);
+  $("#mbck").classList.add("show");
+  document.body.classList.add("modal-open");
+}
+function closeModal(){
+  $("#mbck").classList.remove("show");
+  document.body.classList.remove("modal-open");
+  $("#mbody").innerHTML="";$("#mfoot").innerHTML="";
+}
+function confirmDlg(title,msg,okLbl,danger){
+  return new Promise(function(res){
+    openModal({title:title,body:'<p class="cmsg">'+esc(msg)+'</p>',
+      footer:'<button class="btn ghost" id="cfNo">Cancel</button><button class="btn '+(danger===false?"primary":"danger")+'" id="cfYes">'+esc(okLbl||"Confirm")+'</button>'});
+    $("#cfNo").onclick=function(){closeModal();res(false);};
+    $("#cfYes").onclick=function(){closeModal();res(true);};
+  });
+}
+
+/* ---------- CSV / File ---------- */
+function csvE(v){var s=String(v==null?"":v);return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
+function toCSV(h,rows){var l=[h.map(csvE).join(",")];rows.forEach(function(r){l.push(r.map(csvE).join(","));});return "\ufeff"+l.join("\r\n");}
+function dl(name,content,mime){
+  var b=new Blob([content],{type:mime||"text/plain;charset=utf-8"});
+  var u=URL.createObjectURL(b),a=document.createElement("a");
+  a.href=u;a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(u);a.remove();},120);
+}
+function simpleTable(h,rows,foot){
+  var x='<table class="rt"><thead><tr>';
+  h.forEach(function(t){x+="<th>"+esc(t)+"</th>";});
+  x+="</tr></thead><tbody>";
+  if(!rows.length){x+='<tr><td colspan="'+h.length+'" style="text-align:center;color:#6b7a90;padding:18px">No records found.</td></tr>';}
+  else{rows.forEach(function(r){x+="<tr>";r.forEach(function(c){x+="<td>"+c+"</td>";});x+="</tr>";});}
+  x+="</tbody>";
+  if(foot){x+="<tfoot><tr>";foot.forEach(function(c){x+="<td>"+c+"</td>";});x+="</tr></tfoot>";}
+  x+="</table>";
+  return x;
+}
+function printDoc(title,html){
+  var r=$("#printRoot");
+  r.innerHTML="<h1>"+esc(title)+"</h1>"+
+    '<div class="print-sub">Electrical Spare Parts Management System — Textile Factory, Electrical Maintenance Department</div>'+
+    '<div class="print-meta">Generated: '+esc(new Date().toLocaleString())+'</div>'+html;
+  window.print();
+}
+
+/* ---------- Navigation ---------- */
+var VT={dashboard:"Dashboard",inventory:"Spare Parts Inventory",stockin:"Stock In / Receive",stockout:"Stock Out / Issue",transactions:"Transaction History",alerts:"Low Stock Alerts",reports:"Reports",data:"Data & Backup"};
+function showView(v){
+  if(!VT[v])v="dashboard";
+  curView=v;
+  $$(".view").forEach(function(s){s.classList.toggle("active",s.id==="v-"+v);});
+  $$(".nav-item").forEach(function(b){b.classList.toggle("active",b.dataset.v===v);});
+  $("#ptitle").textContent=VT[v];
+  $("#sb").classList.remove("open");$("#sbck").classList.remove("show");
+  window.scrollTo({top:0});
+  if(v==="dashboard")renderDash();
+  if(v==="inventory")renderInv();
+  if(v==="stockin"){fillSelects();renderRec("IN");}
+  if(v==="stockout"){fillSelects();renderRec("OUT");}
+  if(v==="transactions")renderTxn();
+  if(v==="alerts")renderAlerts();
+  if(v==="data")renderData();
+}
+
+/* ---------- Stats ---------- */
+function stats(){
+  var ty=DB.parts.length,tq=0,lw=0,ou=0,tv=0;
+  DB.parts.forEach(function(p){
+    var c=calc(p);tq+=c.cur;tv+=c.val;
+    if(c.st==="out")ou++;else if(c.st==="low")lw++;
+  });
+  var mk=curMonth(),im=0,om=0;
+  DB.transactions.forEach(function(t){
+    if(String(t.date).slice(0,7)===mk){
+      if(t.type==="IN")im+=num(t.qty);else om+=num(t.qty);
+    }
+  });
+  return {types:ty,qty:r3(tq),low:lw,out:ou,value:Math.round(tv*100)/100,inM:r3(im),outM:r3(om)};
+}
+var IC={
+ box:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>',
+ layers:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 2l9 5-9 5-9-5z"/><path d="M3 12l9 5 9-5"/><path d="M3 17l9 5 9-5"/></svg>',
+ warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>',
+ x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>',
+ cash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>',
+ down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3v10M8 9l4 4 4-4M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>',
+ up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 14V4M8 8l4-4 4 4M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>'
+};
+function card(tone,ic,lbl,val,sub){
+  return '<div class="stat t-'+tone+'"><div class="sic">'+ic+'</div><div>'+
+    '<div class="slbl">'+esc(lbl)+'</div><div class="sval">'+val+'</div>'+
+    (sub?'<div class="ssub">'+esc(sub)+'</div>':'')+'</div></div>';
+}
+
+/* ---------- Dashboard ---------- */
+function renderDash(){
+  var s=stats();
+  $("#dashCards").innerHTML=
+    card("navy",IC.box,"Total Part Types",s.types,"Distinct spare parts recorded")+
+    card("blue",IC.layers,"Total Available Stock",qf(s.qty),"Sum of current stock (all items)")+
+    card("amber",IC.warn,"Low Stock Items",s.low,"At or below reorder level")+
+    card("red",IC.x,"Out of Stock Items",s.out,"Zero available quantity")+
+    card("teal",IC.cash,"Total Inventory Value",money(s.value),"Current stock × unit price")+
+    card("green",IC.down,"Received This Month",qf(s.inM),"Total qty in "+mlabel(curMonth()))+
+    card("purple",IC.up,"Issued This Month",qf(s.outM),"Total qty in "+mlabel(curMonth()));
+
+  var list=[];
+  DB.parts.forEach(function(p){var c=calc(p);if(c.st==="low"||c.st==="out")list.push({p:p,c:c});});
+  list.sort(function(a,b){if(a.c.st!==b.c.st)return a.c.st==="out"?-1:1;return a.c.cur-b.c.cur;});
+  var ab=$("#dashAlerts");
+  if(!list.length)ab.innerHTML='<div class="empty"><strong>No alerts</strong>All items are above their reorder level.</div>';
+  else{
+    var h="";list.slice(0,8).forEach(function(it){
+      var sev=it.c.st==="out"?"out":"low";
+      h+='<div class="arow"><span class="adot '+sev+'"></span><div class="amain"><div class="t">'+esc(it.p.name)+'</div>'+
+        '<div class="s">'+esc(it.p.code)+' • '+esc(it.p.category||"—")+' • Min: '+qf(it.p.minLevel)+' '+esc(it.p.unit)+'</div></div>'+
+        '<div class="aqty" style="color:'+(sev==="out"?"#b3261e":"#9a6108")+'">'+qf(it.c.cur)+' '+esc(it.p.unit)+'</div></div>';
+    });
+    ab.innerHTML=h;
+  }
+  var rec=DB.transactions.slice().sort(function(a,b){
+    if(a.date!==b.date)return a.date<b.date?1:-1;
+    return String(b.id).localeCompare(String(a.id));
+  }).slice(0,8);
+  var rb=$("#dashRecent");
+  if(!rec.length)rb.innerHTML='<div class="empty"><strong>No transactions yet</strong>Use Stock In or Stock Out to begin.</div>';
+  else{
+    var h="";
+    rec.forEach(function(t){
+      var p=DB.parts.find(function(x){return x.id===t.partId;});
+      var bg=t.type==="IN"?'<span class="bdg in">IN</span>':'<span class="bdg outt">OUT</span>';
+      h+='<div class="arow"><span class="adot" style="background:'+(t.type==="IN"?"#2f7cf6":"#d64545")+'"></span>'+
+        '<div class="amain"><div class="t">'+esc(p?p.name:"(deleted item)")+'</div>'+
+        '<div class="s">'+esc(t.id)+' • '+esc(pdate(t.date))+(t.dept?' • '+esc(t.dept):'')+'</div></div>'+
+        '<div style="text-align:right">'+bg+'<div style="font-size:12px;font-weight:700;margin-top:3px">'+qf(t.qty)+'</div></div></div>';
+    });
+    rb.innerHTML=h;
+  }
+  var nb=$("#nbadge");
+  if(s.low+s.out>0){nb.textContent=s.low+s.out;nb.classList.remove("hide");}
+  else nb.classList.add("hide");
+}
+
+/* ---------- Inventory ---------- */
+function refreshCat(){
+  var cats={};DB.parts.forEach(function(p){if(p.category)cats[p.category]=1;});
+  var keys=Object.keys(cats).sort(),sel=$("#invCat"),cur=sel.value;
+  sel.innerHTML='<option value="">All categories</option>'+keys.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join("");
+  if(keys.indexOf(cur)>=0)sel.value=cur;
+}
+function filtParts(){
+  var q=F.q.toLowerCase().trim();
+  var l=DB.parts.filter(function(p){
+    if(F.cat&&p.category!==F.cat)return false;
+    var c=calc(p);
+    if(F.stat&&c.st!==F.stat)return false;
+    if(!q)return true;
+    var h=[p.name,p.code,p.model,p.category,p.brand,p.location,p.specification].map(function(x){return String(x||"").toLowerCase();}).join(" ");
+    return h.indexOf(q)>=0;
+  });
+  var k=F.sk,d=F.sd==="asc"?1:-1;
+  l.sort(function(a,b){
+    var av,bv;
+    if(k==="cur"){av=calc(a).cur;bv=calc(b).cur;}
+    else if(k==="val"){av=calc(a).val;bv=calc(b).val;}
+    else if(k==="unitPrice"){av=num(a.unitPrice);bv=num(b.unitPrice);}
+    else if(k==="minLevel"){av=num(a.minLevel);bv=num(b.minLevel);}
+    else{av=String(a[k]||"").toLowerCase();bv=String(b[k]||"").toLowerCase();}
+    if(av<bv)return -1*d;if(av>bv)return 1*d;return 0;
+  });
+  return l;
+}
+function sh(key,lbl){
+  var a=F.sk===key?(F.sd==="asc"?" ▲":" ▼"):"";
+  return '<th class="sortable" data-sk="'+key+'">'+esc(lbl)+'<span style="font-size:10px;color:#2563eb;margin-left:3px">'+a+'</span></th>';
+}
+function renderInv(){
+  refreshCat();
+  var l=filtParts();
+  var h="<thead><tr>"+sh("id","ID")+sh("name","Item Name")+sh("code","Code")+sh("category","Category")+
+    sh("brand","Brand")+sh("location","Location")+sh("cur","Stock")+sh("minLevel","Min")+
+    sh("unitPrice","Unit Price")+sh("val","Stock Value")+"<th>Status</th><th>Actions</th></tr></thead><tbody>";
+  if(!l.length){h+='<tr><td colspan="12"><div class="empty"><strong>No spare parts found</strong>Try changing filters or add a new part.</div></td></tr>';}
+  else{
+    l.forEach(function(p){
+      var c=calc(p);
+      var cls=c.st==="out"?"rout":(c.st==="low"?"rlow":"");
+      var bc=c.st==="out"?"out":(c.st==="low"?"low":"ok");
+      var bt=c.st==="out"?"Out of Stock":(c.st==="low"?"Low Stock":"In Stock");
+      h+='<tr class="'+cls+'"><td class="cc">'+esc(p.id)+(p.demo?' <span class="bdg demo">DEMO</span>':'')+'</td>'+
+        '<td class="cs">'+esc(p.name)+'</td><td class="cc">'+esc(p.code)+'</td>'+
+        '<td>'+esc(p.category||"—")+'</td><td>'+esc(p.brand||"—")+'</td>'+
+        '<td>'+esc(p.location||"—")+'</td><td><b>'+qf(c.cur)+'</b> '+esc(p.unit)+'</td>'+
+        '<td>'+qf(p.minLevel)+'</td><td>'+money(p.unitPrice)+'</td><td><b>'+money(c.val)+'</b></td>'+
+        '<td><span class="bdg '+bc+'">'+bt+'</span></td>'+
+        '<td><div class="racts"><button class="ibtn" data-a="v" data-id="'+esc(p.id)+'">View</button>'+
+        '<button class="ibtn" data-a="e" data-id="'+esc(p.id)+'">Edit</button>'+
+        '<button class="ibtn del" data-a="d" data-id="'+esc(p.id)+'">Delete</button></div></td></tr>';
+    });
+  }
+  h+="</tbody>";
+  $("#invTable").innerHTML=h;
+  var tv=l.reduce(function(s,p){return s+calc(p).val;},0);
+  $("#invFoot").textContent="Showing "+l.length+" of "+DB.parts.length+" spare part types • Total value of shown items: "+money(tv);
+}
+
+/* ---------- Part Form ---------- */
+function partForm(p){
+  p=p||{};
+  var uo=UNITS.map(function(u){return '<option value="'+u+'"'+(p.unit===u?" selected":"")+'>'+u+'</option>';}).join("");
+  return '<div class="fg">'+
+    '<div class="fld"><label>Item Name <span class="req">*</span></label><input id="f_name" type="text" maxlength="100" value="'+esc(p.name||"")+'"></div>'+
+    '<div class="fld"><label>Item Code / Model No. <span class="req">*</span></label><input id="f_code" type="text" maxlength="60" value="'+esc(p.code||"")+'"></div>'+
+    '<div class="fld"><label>Category</label><input id="f_cat" type="text" maxlength="60" list="catList" value="'+esc(p.category||"")+'"></div>'+
+    '<div class="fld"><label>Brand</label><input id="f_brand" type="text" maxlength="60" value="'+esc(p.brand||"")+'"></div>'+
+    '<div class="fld sp2"><label>Specification / Rating</label><input id="f_spec" type="text" maxlength="120" value="'+esc(p.specification||"")+'"></div>'+
+    '<div class="fld"><label>Unit</label><select id="f_unit">'+uo+'</select></div>'+
+    '<div class="fld"><label>Store / Rack Location</label><input id="f_loc" type="text" maxlength="60" value="'+esc(p.location||"")+'"></div>'+
+    '<div class="fld"><label>Opening Stock</label><input id="f_open" type="number" min="0" step="0.001" value="'+num(p.openingStock)+'"></div>'+
+    '<div class="fld"><label>Minimum / Reorder Level</label><input id="f_min" type="number" min="0" step="0.001" value="'+num(p.minLevel)+'"></div>'+
+    '<div class="fld"><label>Unit Purchase Price (৳)</label><input id="f_pr" type="number" min="0" step="0.01" value="'+num(p.unitPrice)+'"></div>'+
+    '<div class="fld"><label>Supplier Name</label><input id="f_sup" type="text" maxlength="80" value="'+esc(p.supplier||"")+'"></div>'+
+    '<div class="fld sp2"><label>Remarks</label><textarea id="f_rem" rows="2" maxlength="300">'+esc(p.remarks||"")+'</textarea></div>'+
+    '</div><p class="hint" id="f_err" style="color:#b3261e;margin-top:10px;display:none"></p>';
+}
+function openAdd(){
+  openModal({title:"Add New Spare Part",wide:true,body:partForm({}),
+    footer:'<button class="btn ghost" id="pfNo">Cancel</button><button class="btn primary" id="pfYes">Save Part</button>'});
+  $("#pfNo").onclick=closeModal;
+  $("#pfYes").onclick=function(){submitPart(null);};
+}
+function openEdit(id){
+  var p=DB.parts.find(function(x){return x.id===id;});
+  if(!p)return;
+  openModal({title:"Edit Spare Part — "+p.id,wide:true,body:partForm(p),
+    footer:'<button class="btn ghost" id="pfNo">Cancel</button><button class="btn primary" id="pfYes">Update Part</button>'});
+  $("#pfNo").onclick=closeModal;
+  $("#pfYes").onclick=function(){submitPart(id);};
+}
+function submitPart(editId){
+  var er=$("#f_err");er.style.display="none";
+  function fail(m){er.textContent=m;er.style.display="block";}
+  var name=$("#f_name").value.trim();
+  var code=$("#f_code").value.trim();
+  if(!name)return fail("Item name is required.");
+  if(!code)return fail("Item code / model number is required.");
+  var dup=DB.parts.find(function(x){return x.id!==editId&&String(x.code).toLowerCase()===code.toLowerCase();});
+  if(dup)return fail('Item code "'+code+'" is already used by '+dup.id+' — '+dup.name+".");
+  var data={
+    name:name,code:code,
+    category:$("#f_cat").value.trim(),
+    brand:$("#f_brand").value.trim(),
+    specification:$("#f_spec").value.trim(),
+    unit:$("#f_unit").value,
+    location:$("#f_loc").value.trim(),
+    openingStock:Math.max(0,num($("#f_open").value)),
+    minLevel:Math.max(0,num($("#f_min").value)),
+    unitPrice:Math.max(0,num($("#f_pr").value)),
+    supplier:$("#f_sup").value.trim(),
+    remarks:$("#f_rem").value.trim()
+  };
+  if(editId){
+    var p=DB.parts.find(function(x){return x.id===editId;});
+    if(!p)return;
+    Object.keys(data).forEach(function(k){p[k]=data[k];});
+    if(calc(p).cur<0)return fail("This opening stock would make current stock negative. Reduce issued quantity or increase opening stock.");
+  }else{
+    data.id=nextPid();data.demo=false;data.createdAt=today();
+    DB.parts.push(data);
+  }
+  if(!save())return;
+  rebuildTotals();closeModal();
+  toast(editId?"Spare part updated successfully.":"Spare part added successfully.","success");
+  refreshAll();
+}
+async function delPart(id){
+  var p=DB.parts.find(function(x){return x.id===id;});
+  if(!p)return;
+  var tc=DB.transactions.filter(function(t){return t.partId===id;}).length;
+  var msg='Delete "'+p.name+'" ('+p.id+')?'+(tc?"\n\nThis will also delete "+tc+" linked transaction record(s). This cannot be undone.":"\n\nThis cannot be undone.");
+  var ok=await confirmDlg("Delete Spare Part",msg,"Delete Permanently");
+  if(!ok)return;
+  DB.parts=DB.parts.filter(function(x){return x.id!==id;});
+  DB.transactions=DB.transactions.filter(function(t){return t.partId!==id;});
+  save();rebuildTotals();
+  toast("Spare part deleted.","success");
+  refreshAll();
+}
+function viewPart(id){
+  var p=DB.parts.find(function(x){return x.id===id;});
+  if(!p)return;
+  var c=calc(p);
+  var sc=c.st==="out"?"out":(c.st==="low"?"low":"ok");
+  var st=c.st==="out"?"Out of Stock":(c.st==="low"?"Low Stock":"In Stock");
+  function di(k,v){return '<div class="di"><div class="k">'+esc(k)+'</div><div class="v">'+v+'</div></div>';}
+  var b='<div class="dg">'+
+    di("Item ID",p.id+(p.demo?" (DEMO)":""))+di("Item Name",esc(p.name))+
+    di("Code / Model",esc(p.code))+di("Category",esc(p.category||"—"))+
+    di("Brand",esc(p.brand||"—"))+di("Specification",esc(p.specification||"—"))+
+    di("Unit",esc(p.unit))+di("Location",esc(p.location||"—"))+
+    di("Supplier",esc(p.supplier||"—"))+di("Unit Price",money(p.unitPrice))+'</div>'+
+    '<div class="stitle">Stock Summary</div>'+
+    '<div class="dg">'+di("Opening Stock",qf(p.openingStock)+" "+esc(p.unit))+
+    di("Total Received",qf(c.tin)+" "+esc(p.unit))+
+    di("Total Issued",qf(c.tout)+" "+esc(p.unit))+
+    di("Current Available",'<b>'+qf(c.cur)+" "+esc(p.unit)+"</b>")+
+    di("Reorder Level",qf(p.minLevel)+" "+esc(p.unit))+
+    di("Stock Value",'<b>'+money(c.val)+"</b>")+
+    di("Status",'<span class="bdg '+sc+'">'+st+"</span>")+
+    di("Suggested Reorder",c.st==="in"?"—":qf(suggest(p,c))+" "+esc(p.unit))+'</div>'+
+    (p.remarks?'<div class="stitle">Remarks</div><p class="hint" style="font-size:13px;color:#3d4c63">'+esc(p.remarks)+"</p>":"");
+  var txns=DB.transactions.filter(function(t){return t.partId===id;}).sort(function(a,b){return a.date<b.date?1:-1;}).slice(0,15);
+  if(txns.length){
+    b+='<div class="stitle">Recent Transactions ('+txns.length+")</div>";
+    b+=simpleTable(["Txn ID","Date","Type","Qty","Ref/Dept","Person"],
+      txns.map(function(t){
+        return [esc(t.id),esc(pdate(t.date)),
+          t.type==="IN"?'<span class="bdg in">IN</span>':'<span class="bdg outt">OUT</span>',
+          qf(t.qty)+" "+esc(p.unit),
+          esc(t.invoice||t.requisition||t.dept||"—"),
+          esc(t.receivedBy||t.issuedTo||t.issuedBy||"—")];
+      }));
+  }
+  openModal({title:"Spare Part Details",wide:true,body:b,
+    footer:'<button class="btn ghost" id="vpNo">Close</button><button class="btn primary" id="vpEd">Edit This Part</button>'});
+  $("#vpNo").onclick=closeModal;
+  $("#vpEd").onclick=function(){closeModal();openEdit(id);};
+}
+
+/* ---------- Stock In / Out ---------- */
+function fillSelects(){
+  var o='<option value="">— Select spare part —</option>';
+  var s=DB.parts.slice().sort(function(a,b){return String(a.name).localeCompare(String(b.name));});
+  s.forEach(function(p){
+    var c=calc(p);
+    o+='<option value="'+esc(p.id)+'">'+esc(p.name)+' ('+esc(p.code)+') — '+qf(c.cur)+" "+esc(p.unit)+'</option>';
+  });
+  var si=$("#inPart"),so=$("#outPart");
+  if(si){var v=si.value;si.innerHTML=o;si.value=v;}
+  if(so){var v2=so.value;so.innerHTML=o;so.value=v2;}
+}
+function renderRec(type){
+  var l=DB.transactions.filter(function(t){return t.type===type;})
+    .sort(function(a,b){if(a.date!==b.date)return a.date<b.date?1:-1;return String(b.id).localeCompare(String(a.id));}).slice(0,12);
+  var b=type==="IN"?$("#recIn"):$("#recOut");
+  if(!b)return;
+  if(!l.length){b.innerHTML='<div class="empty"><strong>No records yet</strong>Saved '+(type==="IN"?"receipts":"issues")+' will appear here.</div>';return;}
+  var h="";
+  l.forEach(function(t){
+    var p=DB.parts.find(function(x){return x.id===t.partId;});
+    h+='<div class="arow"><span class="adot" style="background:'+(type==="IN"?"#2f7cf6":"#d64545")+'"></span>'+
+      '<div class="amain"><div class="t">'+esc(p?p.name:"(deleted)")+'</div>'+
+      '<div class="s">'+esc(t.id)+' • '+esc(pdate(t.date))+
+      (type==="IN"?(t.supplier?" • "+esc(t.supplier):""):(t.dept?" • "+esc(t.dept):""))+'</div></div>'+
+      '<div style="font-size:12.5px;font-weight:700">'+qf(t.qty)+" "+esc(p?p.unit:"")+'</div></div>';
+  });
+  b.innerHTML=h;
+}
+function doStockIn(e){
+  e.preventDefault();
+  var pid=$("#inPart").value;
+  if(!pid){toast("Please select a spare part.","error");return;}
+  var q=num($("#inQty").value);
+  if(!(q>0)){toast("Received quantity must be greater than zero.","error");return;}
+  var d=$("#inDate").value||today();
+  if(d>today()){toast("Receive date cannot be in the future.","error");return;}
+  var p=DB.parts.find(function(x){return x.id===pid;});
+  if(!p){toast("Selected part no longer exists.","error");return;}
+  var pv=$("#inPrice").value===""?null:num($("#inPrice").value);
+  if(pv!==null&&pv<0){toast("Purchase price cannot be negative.","error");return;}
+  var t={id:nextTid("IN"),type:"IN",date:d,partId:p.id,partName:p.name,partCode:p.code,
+    qty:r3(q),unit:p.unit,price:pv===null?num(p.unitPrice):pv,
+    supplier:$("#inSup").value.trim(),invoice:$("#inInv").value.trim(),
+    receivedBy:$("#inBy").value.trim(),remarks:$("#inRem").value.trim(),
+    createdAt:new Date().toISOString()};
+  DB.transactions.push(t);
+  if($("#inUpd").checked&&pv!==null&&pv>0)p.unitPrice=pv;
+  if(!p.supplier&&t.supplier)p.supplier=t.supplier;
+  if(!save()){DB.transactions.pop();return;}
+  rebuildTotals();
+  $("#inForm").reset();$("#inDate").value=today();$("#inUpd").checked=true;
+  toast("Stock received. "+qf(q)+" "+p.unit+" of "+p.name+" added.","success");
+  refreshAll();fillSelects();renderRec("IN");
+}
+function doStockOut(e){
+  e.preventDefault();
+  var pid=$("#outPart").value;
+  if(!pid){toast("Please select a spare part.","error");return;}
+  var q=num($("#outQty").value);
+  if(!(q>0)){toast("Issue quantity must be greater than zero.","error");return;}
+  var d=$("#outDate").value||today();
+  if(d>today()){toast("Issue date cannot be in the future.","error");return;}
+  var p=DB.parts.find(function(x){return x.id===pid;});
+  if(!p){toast("Selected part no longer exists.","error");return;}
+  var c=calc(p);
+  if(q>c.cur){toast("Insufficient stock. Available: "+qf(c.cur)+" "+p.unit+".","error");return;}
+  var t={id:nextTid("OUT"),type:"OUT",date:d,partId:p.id,partName:p.name,partCode:p.code,
+    qty:r3(q),unit:p.unit,dept:$("#outDept").value.trim(),issuedTo:$("#outTo").value.trim(),
+    requisition:$("#outReq").value.trim(),approvedBy:$("#outApp").value.trim(),
+    issuedBy:$("#outBy").value.trim(),remarks:$("#outRem").value.trim(),
+    createdAt:new Date().toISOString()};
+  DB.transactions.push(t);
+  if(!save()){DB.transactions.pop();return;}
+  rebuildTotals();
+  $("#outForm").reset();$("#outDate").value=today();
+  toast("Stock issued. "+qf(q)+" "+p.unit+" of "+p.name+" issued.","success");
+  refreshAll();fillSelects();renderRec("OUT");
+}
+
+/* ---------- Transactions ---------- */
+function filtTxn(){
+  var f=TF,iq=f.item.toLowerCase().trim(),dq=f.dept.toLowerCase().trim();
+  var l=DB.transactions.filter(function(t){
+    if(f.type&&t.type!==f.type)return false;
+    if(f.from&&t.date<f.from)return false;
+    if(f.to&&t.date>f.to)return false;
+    if(iq){
+      var p=DB.parts.find(function(x){return x.id===t.partId;});
+      var h=(t.partName+" "+t.partCode+" "+(p?p.name+" "+p.code:"")).toLowerCase();
+      if(h.indexOf(iq)<0)return false;
+    }
+    if(dq){
+      var dd=(t.dept||"")+" "+(t.issuedTo||"")+" "+(t.receivedBy||"");
+      if(dd.toLowerCase().indexOf(dq)<0)return false;
+    }
+    return true;
+  });
+  var k=f.sk,d=f.sd==="asc"?1:-1;
+  l.sort(function(a,b){
+    var av,bv;
+    if(k==="date"){av=a.date;bv=b.date;}
+    else if(k==="qty"){av=num(a.qty);bv=num(b.qty);}
+    else{av=String(a[k]||"").toLowerCase();bv=String(b[k]||"").toLowerCase();}
+    if(av<bv)return -1*d;if(av>bv)return 1*d;return 0;
+  });
+  return l;
+}
+function shT(key,lbl){
+  var a=TF.sk===key?(TF.sd==="asc"?" ▲":" ▼"):"";
+  return '<th class="sortable" data-tk="'+key+'">'+esc(lbl)+'<span style="font-size:10px;color:#2563eb;margin-left:3px">'+a+'</span></th>';
+}
+function renderTxn(){
+  var l=filtTxn();
+  var h="<thead><tr>"+shT("id","Txn ID")+shT("date","Date")+shT("type","Type")+shT("partName","Item")+
+    shT("qty","Qty")+"<th>Reference</th><th>Department / Person</th><th>By</th><th>Remarks</th></tr></thead><tbody>";
+  if(!l.length){h+='<tr><td colspan="9"><div class="empty"><strong>No transactions found</strong>Adjust filters or record a new transaction.</div></td></tr>';}
+  else{
+    l.forEach(function(t){
+      var p=DB.parts.find(function(x){return x.id===t.partId;});
+      var ref=t.type==="IN"?(t.invoice?"Inv: "+esc(t.invoice):"—"):(t.requisition?"Req: "+esc(t.requisition):"—");
+      var dp=t.type==="IN"?(t.supplier?esc(t.supplier):"—"):((t.dept?esc(t.dept):"—")+(t.issuedTo?" • "+esc(t.issuedTo):""));
+      var by=t.type==="IN"?(t.receivedBy?esc(t.receivedBy):"—"):(t.issuedBy?esc(t.issuedBy):"—");
+      h+='<tr><td class="cc">'+esc(t.id)+'</td><td>'+esc(pdate(t.date))+'</td>'+
+        '<td>'+(t.type==="IN"?'<span class="bdg in">IN</span>':'<span class="bdg outt">OUT</span>')+'</td>'+
+        '<td class="cs">'+esc(p?p.name:t.partName)+'<div class="hint" style="font-size:11px">'+esc(p?p.code:t.partCode)+'</div></td>'+
+        '<td><b>'+qf(t.qty)+'</b> '+esc(p?p.unit:t.unit||"")+'</td>'+
+        '<td>'+ref+'</td><td>'+dp+'</td><td>'+by+'</td><td>'+esc(t.remarks||"—")+'</td></tr>';
+    });
+  }
+  h+="</tbody>";
+  $("#txnTable").innerHTML=h;
+  var iq=0,oq=0;
+  l.forEach(function(t){if(t.type==="IN")iq+=num(t.qty);else oq+=num(t.qty);});
+  $("#txnFoot").textContent="Showing "+l.length+" transaction(s) • Total received: "+qf(iq)+" • Total issued: "+qf(oq);
+}
+
+/* ---------- Alerts ---------- */
+function renderAlerts(){
+  var l=[];
+  DB.parts.forEach(function(p){var c=calc(p);if(c.st==="low"||c.st==="out")l.push({p:p,c:c});});
+  l.sort(function(a,b){if(a.c.st!==b.c.st)return a.c.st==="out"?-1:1;return a.c.cur-b.c.cur;});
+  var oc=l.filter(function(x){return x.c.st==="out";}).length;
+  var lc=l.length-oc;
+  $("#alCards").innerHTML=
+    card("red",IC.x,"Out of Stock Items",oc,"Current quantity is zero")+
+    card("amber",IC.warn,"Low Stock Items",lc,"At or below reorder level")+
+    card("blue",IC.layers,"Total Items Needing Action",l.length,"Reorder these items soon");
+  var h="<thead><tr><th>ID</th><th>Item Name</th><th>Code</th><th>Category</th><th>Location</th><th>Current</th><th>Reorder</th><th>Suggested</th><th>Status</th><th>Supplier</th></tr></thead><tbody>";
+  if(!l.length)h+='<tr><td colspan="10"><div class="empty"><strong>No alerts</strong>All spare parts are above their reorder level.</div></td></tr>';
+  else{
+    l.forEach(function(it){
+      var p=it.p,c=it.c;
+      var cls=c.st==="out"?"out":"low";
+      var txt=c.st==="out"?"Out of Stock":"Low Stock";
+      h+='<tr class="'+(c.st==="out"?"rout":"rlow")+'"><td class="cc">'+esc(p.id)+'</td>'+
+        '<td class="cs">'+esc(p.name)+(p.demo?' <span class="bdg demo">DEMO</span>':'')+'</td>'+
+        '<td class="cc">'+esc(p.code)+'</td><td>'+esc(p.category||"—")+'</td><td>'+esc(p.location||"—")+'</td>'+
+        '<td><b>'+qf(c.cur)+'</b> '+esc(p.unit)+'</td><td>'+qf(p.minLevel)+'</td>'+
+        '<td><b>'+qf(suggest(p,c))+" "+esc(p.unit)+'</b></td>'+
+        '<td><span class="bdg '+cls+'">'+txt+'</span></td><td>'+esc(p.supplier||"—")+'</td></tr>';
+    });
+  }
+  h+="</tbody>";
+  $("#alTable").innerHTML=h;
+  $("#alFoot").textContent=l.length+" item(s) require attention • Suggested reorder tops the item up to twice its reorder level.";
+}
+
+/* ---------- Reports ---------- */
+function buildRep(kind){
+  var from=$("#repFrom").value||"",to=$("#repTo").value||"";
+  var title="",heads=[],rows=[],foot=null,sum="";
+  if(kind==="current"){
+    title="Current Stock Report";
+    heads=["ID","Item Name","Code","Category","Unit","Location","Opening","Received","Issued","Current","Reorder","Unit Price","Stock Value","Status"];
+    DB.parts.slice().sort(function(a,b){return String(a.name).localeCompare(String(b.name));}).forEach(function(p){
+      var c=calc(p);
+      var st=c.st==="out"?"Out of Stock":(c.st==="low"?"Low Stock":"In Stock");
+      rows.push([esc(p.id),esc(p.name),esc(p.code),esc(p.category||"—"),esc(p.unit),esc(p.location||"—"),
+        qf(p.openingStock),qf(c.tin),qf(c.tout),"<b>"+qf(c.cur)+"</b>",qf(p.minLevel),
+        money(p.unitPrice),"<b>"+money(c.val)+"</b>",st]);
+    });
+    var tv=DB.parts.reduce(function(s,p){return s+calc(p).val;},0);
+    var tq=DB.parts.reduce(function(s,p){return s+calc(p).cur;},0);
+    sum='<div class="rsum"><div>Total Part Types<b>'+DB.parts.length+'</b></div><div>Total Qty<b>'+qf(tq)+'</b></div><div>Total Value<b>'+money(tv)+'</b></div></div>';
+    foot=["","","","","","","","","","","","TOTAL",money(tv),""];
+  }
+  else if(kind==="in"||kind==="out"){
+    title=kind==="in"?"Stock In Report":"Stock Out Report";
+    heads=kind==="in"?["Txn ID","Date","Item","Code","Qty","Unit","Supplier","Invoice","Received By","Remarks"]
+      :["Txn ID","Date","Item","Code","Qty","Unit","Department / Machine","Issued To","Requisition","Approved By","Issued By","Remarks"];
+    var l=DB.transactions.filter(function(t){
+      if(t.type!==(kind==="in"?"IN":"OUT"))return false;
+      if(from&&t.date<from)return false;
+      if(to&&t.date>to)return false;
+      return true;
+    }).sort(function(a,b){return a.date<b.date?1:-1;});
+    var tq=0;
+    l.forEach(function(t){
+      var p=DB.parts.find(function(x){return x.id===t.partId;});
+      tq+=num(t.qty);
+      if(kind==="in"){
+        rows.push([esc(t.id),esc(pdate(t.date)),esc(p?p.name:t.partName),esc(p?p.code:t.partCode),
+          qf(t.qty),esc(p?p.unit:t.unit||""),esc(t.supplier||"—"),esc(t.invoice||"—"),
+          esc(t.receivedBy||"—"),esc(t.remarks||"—")]);
+      }else{
+        rows.push([esc(t.id),esc(pdate(t.date)),esc(p?p.name:t.partName),esc(p?p.code:t.partCode),
+          qf(t.qty),esc(p?p.unit:t.unit||""),esc(t.dept||"—"),esc(t.issuedTo||"—"),
+          esc(t.requisition||"—"),esc(t.approvedBy||"—"),esc(t.issuedBy||"—"),esc(t.remarks||"—")]);
+      }
+    });
+    var rt=(from||to)?((from?pdate(from):"Start")+" → "+(to?pdate(to):"Today")):"All time";
+    sum='<div class="rsum"><div>Period<b>'+esc(rt)+'</b></div><div>Transactions<b>'+l.length+'</b></div><div>Total Quantity<b>'+qf(tq)+'</b></div></div>';
+    foot=kind==="in"?["","","","","","","","","","TOTAL: "+qf(tq)]:["","","","","","","","","","","","TOTAL: "+qf(tq)];
+  }
+  else if(kind==="low"){
+    title="Low Stock Report";
+    heads=["ID","Item Name","Code","Category","Location","Current","Reorder","Suggested","Unit","Status","Supplier"];
+    var it=DB.parts.map(function(p){return {p:p,c:calc(p)};})
+      .filter(function(x){return x.c.st==="low"||x.c.st==="out";})
+      .sort(function(a,b){return a.c.cur-b.c.cur;});
+    it.forEach(function(x){
+      var st=x.c.st==="out"?"Out of Stock":"Low Stock";
+      rows.push([esc(x.p.id),esc(x.p.name),esc(x.p.code),esc(x.p.category||"—"),esc(x.p.location||"—"),
+        "<b>"+qf(x.c.cur)+"</b>",qf(x.p.minLevel),qf(suggest(x.p,x.c)),esc(x.p.unit),st,esc(x.p.supplier||"—")]);
+    });
+    sum='<div class="rsum"><div>Items Needing Reorder<b>'+it.length+'</b></div></div>';
+  }
+  else if(kind==="valuation"){
+    title="Inventory Valuation Report";
+    heads=["ID","Item Name","Code","Category","Current Qty","Unit","Unit Price","Stock Value","% of Total"];
+    var tot=DB.parts.reduce(function(s,p){return s+calc(p).val;},0);
+    var srt=DB.parts.slice().sort(function(a,b){return calc(b).val-calc(a).val;});
+    srt.forEach(function(p){
+      var c=calc(p);
+      var pc=tot>0?(c.val/tot*100).toFixed(2)+"%":"0%";
+      rows.push([esc(p.id),esc(p.name),esc(p.code),esc(p.category||"—"),
+        qf(c.cur),esc(p.unit),money(p.unitPrice),"<b>"+money(c.val)+"</b>",pc]);
+    });
+    sum='<div class="rsum"><div>Total Inventory Value<b>'+money(tot)+'</b></div><div>Total Part Types<b>'+DB.parts.length+'</b></div></div>';
+    foot=["","","","","","","TOTAL",money(tot),"100%"];
+  }
+  else if(kind==="movement"){
+    title="Monthly Stock Movement Report";
+    var months={};
+    DB.transactions.forEach(function(t){
+      if(from&&t.date<from)return;
+      if(to&&t.date>to)return;
+      var mk=String(t.date).slice(0,7);
+      if(!months[mk])months[mk]={inQ:0,outQ:0,inC:0,outC:0};
+      if(t.type==="IN"){months[mk].inQ+=num(t.qty);months[mk].inC++;}
+      else{months[mk].outQ+=num(t.qty);months[mk].outC++;}
+    });
+    heads=["Month","Stock In Qty","Stock In Count","Stock Out Qty","Stock Out Count","Net Movement"];
+    var keys=Object.keys(months).sort().reverse();
+    var ti=0,to2=0;
+    keys.forEach(function(k){
+      var m=months[k];ti+=m.inQ;to2+=m.outQ;
+      rows.push([mlabel(k),qf(m.inQ),m.inC,qf(m.outQ),m.outC,qf(m.inQ-m.outQ)]);
+    });
+    sum='<div class="rsum"><div>Months<b>'+keys.length+'</b></div><div>Total In<b>'+qf(ti)+'</b></div><div>Total Out<b>'+qf(to2)+'</b></div><div>Net<b>'+qf(ti-to2)+'</b></div></div>';
+    foot=["TOTAL",qf(ti),"",qf(to2),"",qf(ti-to2)];
+  }
+  return {kind:kind,title:title,heads:heads,rows:rows,foot:foot,sum:sum};
+}
+function showRep(kind){
+  var r=buildRep(kind);
+  lastRep=r;
+  $("#repPanel").style.display="block";
+  $("#repTitle").textContent=r.title;
+  $("#repOut").innerHTML=r.sum+simpleTable(r.heads,r.rows,r.foot);
+}
+
+/* ---------- Data Page ---------- */
+function renderData(){
+  var s=stats();
+  $("#dataCards").innerHTML=
+    card("navy",IC.box,"Spare Parts Stored",s.types,"Types in inventory")+
+    card("blue",IC.layers,"Transactions Stored",DB.transactions.length,"Stock in + stock out records")+
+    card("teal",IC.cash,"Inventory Value",money(s.value),"Total current stock value");
+}
+function expInvCsv(){
+  if(!DB.parts.length){toast("No inventory to export.","error");return;}
+  var h=["Item ID","Item Name","Item Code","Category","Brand","Specification","Unit","Store Location","Opening Stock","Total Received","Total Issued","Current Stock","Min / Reorder Level","Unit Price (BDT)","Stock Value (BDT)","Supplier","Remarks","Demo Data"];
+  var rows=DB.parts.slice().sort(function(a,b){return String(a.id).localeCompare(String(b.id));}).map(function(p){
+    var c=calc(p);
+    return [p.id,p.name,p.code,p.category||"",p.brand||"",p.specification||"",p.unit,p.location||"",
+      p.openingStock,c.tin,c.tout,c.cur,p.minLevel,num(p.unitPrice).toFixed(2),c.val.toFixed(2),
+      p.supplier||"",p.remarks||"",p.demo?"DEMO":"USER"];
+  });
+  dl("inventory_"+today()+".csv",toCSV(h,rows),"text/csv;charset=utf-8");
+  toast("Inventory CSV downloaded.","success");
+}
+function expTxnCsv(){
+  if(!DB.transactions.length){toast("No transactions to export.","error");return;}
+  var h=["Txn ID","Type","Date","Item ID","Item Name","Item Code","Quantity","Unit","Unit Price","Total Value","Supplier","Invoice/Challan","Department/Machine","Issued To","Requisition","Approved By","Received By","Issued By","Remarks"];
+  var rows=DB.transactions.slice().sort(function(a,b){return a.date<b.date?1:-1;}).map(function(t){
+    var p=DB.parts.find(function(x){return x.id===t.partId;});
+    var pr=num(t.price);
+    var tot=t.type==="IN"?pr*num(t.qty):0;
+    return [t.id,t.type==="IN"?"Stock In":"Stock Out",t.date,t.partId,p?p.name:t.partName,p?p.code:t.partCode,
+      num(t.qty),p?p.unit:t.unit||"",pr?pr.toFixed(2):"",tot?tot.toFixed(2):"",
+      t.supplier||"",t.invoice||"",t.dept||"",t.issuedTo||"",t.requisition||"",
+      t.approvedBy||"",t.receivedBy||"",t.issuedBy||"",t.remarks||""];
+  });
+  dl("transactions_"+today()+".csv",toCSV(h,rows),"text/csv;charset=utf-8");
+  toast("Transactions CSV downloaded.","success");
+}
+function expBackup(){
+  var b={app:"Electrical Spare Parts Management System",version:1,
+    exportedAt:new Date().toISOString(),counters:DB.counters,parts:DB.parts,transactions:DB.transactions};
+  dl("espms_backup_"+today()+".json",JSON.stringify(b,null,2),"application/json");
+  toast("Backup file downloaded. Keep it in a safe place.","success");
+}
+function restoreFile(file){
+  var rd=new FileReader();
+  rd.onload=function(e){
+    var t=e.target.result,p;
+    try{p=JSON.parse(t);}catch(err){toast("That file is not a valid JSON backup.","error");return;}
+    if(!p||!Array.isArray(p.parts)||!Array.isArray(p.transactions)){
+      toast("Backup file is missing required data (parts / transactions).","error");return;
+    }
+    confirmDlg("Restore Backup",
+      "This will REPLACE all current spare parts and transactions in this browser with the contents of the backup file.\n\nCurrent data will be lost unless you have already exported it. Continue?",
+      "Replace All Data").then(function(ok){
+      if(!ok)return;
+      DB.parts=p.parts.filter(function(x){return x&&x.id;});
+      DB.transactions=p.transactions.filter(function(x){return x&&x.id;});
+      DB.counters=p.counters||{part:0,txn:0};
+      DB.parts.forEach(function(x){
+        x.openingStock=Math.max(0,num(x.openingStock));
+        x.minLevel=Math.max(0,num(x.minLevel));
+        x.unitPrice=Math.max(0,num(x.unitPrice));
+      });
+      DB.transactions.forEach(function(x){x.qty=num(x.qty);x.price=num(x.price);});
+      fixC();save();rebuildTotals();
+      toast("Backup restored successfully. "+DB.parts.length+" parts, "+DB.transactions.length+" transactions.","success");
+      refreshAll();
+    });
+  };
+  rd.onerror=function(){toast("Could not read the selected file.","error");};
+  rd.readAsText(file);
+}
+async function clearAll(){
+  var ok=await confirmDlg("Delete All Data",
+    "This will permanently delete ALL spare parts and ALL transactions stored in this browser. This action cannot be undone. Make sure you have a JSON backup first. Continue?",
+    "Delete Everything");
+  if(!ok)return;
+  var ok2=await confirmDlg("Final Confirmation","Are you absolutely sure? There is no way to recover this data.","Yes, Delete All");
+  if(!ok2)return;
+  DB={parts:[],transactions:[],counters:{part:0,txn:0}};
+  try{localStorage.removeItem(K);}catch(e){}
+  TOT=new Map();chipSet(true);
+  toast("All data has been deleted.","success");
+  refreshAll();
+}
+
+/* ---------- Demo Data ---------- */
+var DEMO=[
+ {name:"Contactor 32A",code:"LC1D32M7",category:"Contactor",brand:"Schneider",specification:"32A, 220V AC coil, 3-pole",unit:"pcs",location:"Rack A-1",openingStock:12,minLevel:5,unitPrice:2450,supplier:"Rangs Electronics",remarks:"Main motor starter contactor."},
+ {name:"MCB 3P 16A",code:"SH203-C16",category:"MCB",brand:"ABB",specification:"3-pole, 16A, 10kA, C-curve",unit:"pcs",location:"Rack A-2",openingStock:30,minLevel:10,unitPrice:720,supplier:"Rangs Electronics",remarks:"Distribution board protection."},
+ {name:"MCCB 100A",code:"NSX100F",category:"MCCB",brand:"Schneider",specification:"100A, 3-pole, 36kA, TM-D trip",unit:"pcs",location:"Rack A-3",openingStock:6,minLevel:3,unitPrice:8600,supplier:"Schneider Bangladesh",remarks:"Main incomer of panel."},
+ {name:"Overload Relay",code:"LRD3357",category:"Overload Relay",brand:"Schneider",specification:"37-50A thermal overload, Class 10A",unit:"pcs",location:"Rack B-1",openingStock:8,minLevel:4,unitPrice:3150,supplier:"Rangs Electronics",remarks:"Motor overload protection."},
+ {name:"24V DC Power Supply",code:"S-350-24",category:"Power Supply",brand:"Mean Well",specification:"24V DC, 14.6A, 350W",unit:"pcs",location:"Rack B-2",openingStock:5,minLevel:2,unitPrice:4200,supplier:"Techno Trade",remarks:"PLC and sensor supply."},
+ {name:"Proximity Sensor",code:"PR18-8DN",category:"Sensor",brand:"Autonics",specification:"M18 PNP NO, 8mm sensing, 12-24V DC",unit:"pcs",location:"Rack B-3",openingStock:18,minLevel:6,unitPrice:980,supplier:"Techno Trade",remarks:"Machine position sensing."},
+ {name:"Cooling Fan",code:"FP-108EX",category:"Fan",brand:"Sunon",specification:"220V AC, 4 inch, 108 CFM",unit:"pcs",location:"Rack C-1",openingStock:10,minLevel:4,unitPrice:1250,supplier:"Techno Trade",remarks:"Panel cooling fan."},
+ {name:"Control Relay",code:"MY4N-GS",category:"Relay",brand:"Omron",specification:"24V DC, 4PDT, 5A",unit:"pcs",location:"Rack C-2",openingStock:22,minLevel:8,unitPrice:540,supplier:"Techno Trade",remarks:"Logic interlocking."},
+ {name:"Fuse 10A",code:"F-10A-500V",category:"Fuse",brand:"Bussmann",specification:"10A, 500V, 10x38mm cartridge",unit:"pcs",location:"Rack C-3",openingStock:60,minLevel:20,unitPrice:35,supplier:"Rangs Electronics",remarks:"Control circuit protection."},
+ {name:"Cable Lug 16mm²",code:"CL-16-R",category:"Cable Accessory",brand:"Generic",specification:"16 mm² ring type, copper, tinned",unit:"pcs",location:"Rack D-1",openingStock:200,minLevel:80,unitPrice:12,supplier:"Local Supplier",remarks:"Panel wiring termination."}
+];
+async function loadDemo(){
+  var ok=await confirmDlg("Load Demo Data",
+    "This will add 10 sample electrical spare parts (clearly marked as DEMO) plus a few sample stock transactions.\n\nYour own existing records will NOT be deleted. Continue?",
+    "Load Demo Data",false);
+  if(!ok)return;
+  var created=[];
+  DEMO.forEach(function(d){
+    var ex=DB.parts.some(function(p){return String(p.code).toLowerCase()===d.code.toLowerCase();});
+    if(ex)return;
+    var p={id:nextPid(),name:d.name,code:d.code,category:d.category,brand:d.brand,
+      specification:d.specification,unit:d.unit,location:d.location,
+      openingStock:d.openingStock,minLevel:d.minLevel,unitPrice:d.unitPrice,
+      supplier:d.supplier,remarks:d.remarks,demo:true,createdAt:today()};
+    DB.parts.push(p);created.push(p);
+  });
+  if(!created.length){toast("Demo parts already exist — nothing new was added.","error");return;}
+  var sups=["Rangs Electronics","Techno Trade","Schneider Bangladesh","Local Supplier"];
+  var deps=["Spinning – Ring Frame 12","Weaving – Loom 8","Dyeing – Pump House","Utility – Compressor Room","Finishing – Stenter 3"];
+  var ppl=["Rakib Hasan","Jahid Hossain","Sohel Rana","Mahfuz Alam","Shahin Mia"];
+  var invs=["INV-2401","INV-2402","CH-2403","INV-2404","CH-2405"];
+  var reqs=["REQ-0451","REQ-0452","REQ-0453","REQ-0454","REQ-0455"];
+  var cnt=0;
+  created.forEach(function(p,i){
+    var di=off(-(30-i*2));
+    DB.transactions.push({id:nextTid("IN"),type:"IN",date:di,partId:p.id,partName:p.name,partCode:p.code,
+      qty:Math.max(2,Math.round(p.openingStock*0.4)),unit:p.unit,price:p.unitPrice,
+      supplier:sups[i%sups.length],invoice:invs[i%invs.length],
+      receivedBy:ppl[i%ppl.length],remarks:"Demo receipt",createdAt:new Date().toISOString()});
+    cnt++;
+    if(i%3!==2){
+      var dOut=off(-(15-i));
+      var q2=Math.max(1,Math.round(p.openingStock*0.15));
+      DB.transactions.push({id:nextTid("OUT"),type:"OUT",date:dOut,partId:p.id,partName:p.name,partCode:p.code,
+        qty:q2,unit:p.unit,dept:deps[i%deps.length],issuedTo:ppl[(i+2)%ppl.length],
+        requisition:reqs[i%reqs.length],approvedBy:"Engr. Kamal Uddin",issuedBy:"Store Keeper",
+        remarks:"Demo issue",createdAt:new Date().toISOString()});
+      cnt++;
+    }
+  });
+  if(!save())return;
+  rebuildTotals();
+  toast("Demo data loaded: "+created.length+" parts and "+cnt+" sample transactions.","success");
+  refreshAll();
+}
+async function removeDemo(){
+  var dp=DB.parts.filter(function(p){return p.demo;});
+  if(!dp.length){toast("There are no demo records to remove.","error");return;}
+  var ok=await confirmDlg("Remove Demo Records",
+    "This will delete "+dp.length+" demo part(s) and their linked demo transactions. Your own records will not be touched. Continue?",
+    "Remove Demo Records");
+  if(!ok)return;
+  var ids=dp.map(function(p){return p.id;});
+  DB.parts=DB.parts.filter(function(p){return !p.demo;});
+  DB.transactions=DB.transactions.filter(function(t){return ids.indexOf(t.partId)<0;});
+  save();rebuildTotals();
+  toast("Demo records removed.","success");
+  refreshAll();
+}
+
+/* ---------- Refresh ---------- */
+function refreshAll(){
+  rebuildTotals();
+  renderDash();
+  refreshCat();
+  if(curView==="inventory")renderInv();
+  if(curView==="transactions")renderTxn();
+  if(curView==="alerts")renderAlerts();
+  if(curView==="data")renderData();
+  if(curView==="stockin"){fillSelects();renderRec("IN");}
+  if(curView==="stockout"){fillSelects();renderRec("OUT");}
+}
+
+/* ---------- Events ---------- */
+function bind(){
+  $$(".nav-item").forEach(function(b){b.addEventListener("click",function(){showView(b.dataset.v);});});
+  $$("[data-goto]").forEach(function(b){b.addEventListener("click",function(){showView(b.dataset.goto);});});
+  $("#mbtn").addEventListener("click",function(){
+    $("#sb").classList.toggle("open");$("#sbck").classList.toggle("show");
+  });
+  $("#sbck").addEventListener("click",function(){$("#sb").classList.remove("open");$("#sbck").classList.remove("show");});
+  $("#mcl").addEventListener("click",closeModal);
+  $("#mbck").addEventListener("click",function(e){if(e.target===$("#mbck"))closeModal();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&$("#mbck").classList.contains("show"))closeModal();});
+
+  // Dashboard print
+  $("#dashPrint").addEventListener("click",function(){
+    var s=stats();
+    var h='<div class="print-summary"><b>Total Part Types:</b> '+s.types+' | '+
+      '<b>Available Stock:</b> '+qf(s.qty)+' | <b>Low Stock:</b> '+s.low+' | <b>Out of Stock:</b> '+s.out+
+      ' | <b>Inventory Value:</b> '+money(s.value)+' | <b>Received This Month:</b> '+qf(s.inM)+
+      ' | <b>Issued This Month:</b> '+qf(s.outM)+'</div>';
+    var rows=DB.parts.map(function(p){
+      var c=calc(p);
+      return [esc(p.id),esc(p.name),esc(p.code),esc(p.category||"—"),qf(c.cur),esc(p.unit),
+        qf(p.minLevel),money(p.unitPrice),money(c.val),
+        c.st==="out"?"Out of Stock":(c.st==="low"?"Low Stock":"In Stock")];
+    });
+    h+=simpleTable(["ID","Item","Code","Category","Current","Unit","Reorder","Unit Price","Value","Status"],rows);
+    printDoc("Inventory Summary",h);
+  });
+
+  // Inventory
+  $("#addPart").addEventListener("click",openAdd);
+  $("#invSearch").addEventListener("input",function(){F.q=this.value;renderInv();});
+  $("#invCat").addEventListener("change",function(){F.cat=this.value;renderInv();});
+  $("#invStat").addEventListener("change",function(){F.stat=this.value;renderInv();});
+  $("#invReset").addEventListener("click",function(){
+    F.q="";F.cat="";F.stat="";
+    $("#invSearch").value="";$("#invCat").value="";$("#invStat").value="";
+    renderInv();
+  });
+  $("#invTable").addEventListener("click",function(e){
+    var th=e.target.closest("th.sortable");
+    if(th){
+      var k=th.dataset.sk;
+      if(F.sk===k)F.sd=F.sd==="asc"?"desc":"asc";
+      else{F.sk=k;F.sd="asc";}
+      renderInv();return;
+    }
+    var b=e.target.closest("button[data-a]");
+    if(!b)return;
+    var id=b.dataset.id,a=b.dataset.a;
+    if(a==="v")viewPart(id);else if(a==="e")openEdit(id);else if(a==="d")delPart(id);
+  });
+  $("#expInv").addEventListener("click",expInvCsv);
+  $("#prtInv").addEventListener("click",function(){
+    var l=filtParts();
+    var rows=l.map(function(p){
+      var c=calc(p);
+      return [esc(p.id),esc(p.name),esc(p.code),esc(p.category||"—"),esc(p.brand||"—"),
+        esc(p.location||"—"),qf(c.cur)+" "+esc(p.unit),qf(p.minLevel),money(p.unitPrice),money(c.val),
+        c.st==="out"?"Out of Stock":(c.st==="low"?"Low Stock":"In Stock")];
+    });
+    var tv=l.reduce(function(s,p){return s+calc(p).val;},0);
+    printDoc("Spare Parts Inventory",
+      '<div class="print-summary"><b>Items:</b> '+l.length+' | <b>Total Value:</b> '+money(tv)+'</div>'+
+      simpleTable(["ID","Item","Code","Category","Brand","Location","Current","Reorder","Unit Price","Value","Status"],rows));
+  });
+
+  // Stock In
+  $("#inForm").addEventListener("submit",doStockIn);
+  $("#inPart").addEventListener("change",function(){
+    var v=this.value;
+    var p=DB.parts.find(function(x){return x.id===v;});
+    var h=$("#inHint");
+    if(p){var c=calc(p);h.textContent="Current stock: "+qf(c.cur)+" "+p.unit+" • Unit price: "+money(p.unitPrice);
+      if(!$("#inPrice").value)$("#inPrice").value=p.unitPrice||"";}
+    else h.textContent="Select the item being received.";
+  });
+
+  // Stock Out
+  $("#outForm").addEventListener("submit",doStockOut);
+  $("#outPart").addEventListener("change",function(){
+    var v=this.value;
+    var p=DB.parts.find(function(x){return x.id===v;});
+    var h=$("#outHint");
+    if(p){var c=calc(p);h.textContent="Available: "+qf(c.cur)+" "+p.unit+" • Reorder level: "+qf(p.minLevel);}
+    else h.textContent="Select the item being issued.";
+  });
+
+  // Transactions
+  $("#txnFrom").addEventListener("change",function(){TF.from=this.value;renderTxn();});
+  $("#txnTo").addEventListener("change",function(){TF.to=this.value;renderTxn();});
+  $("#txnType").addEventListener("change",function(){TF.type=this.value;renderTxn();});
+  $("#txnItem").addEventListener("input",function(){TF.item=this.value;renderTxn();});
+  $("#txnDept").addEventListener("input",function(){TF.dept=this.value;renderTxn();});
+  $("#txnReset").addEventListener("click",function(){
+    TF.from=TF.to=TF.type=TF.item=TF.dept="";
+    $("#txnFrom").value="";$("#txnTo").value="";$("#txnType").value="";
+    $("#txnItem").value="";$("#txnDept").value="";
+    renderTxn();
+  });
+  $("#txnTable").addEventListener("click",function(e){
+    var th=e.target.closest("th.sortable");
+    if(!th)return;
+    var k=th.dataset.tk;
+    if(TF.sk===k)TF.sd=TF.sd==="asc"?"desc":"asc";
+    else{TF.sk=k;TF.sd="asc";}
+    renderTxn();
+  });
+  $("#txnExp").addEventListener("click",expTxnCsv);
+  $("#txnPrt").addEventListener("click",function(){
+    var l=filtTxn();
+    var rows=l.map(function(t){
+      var p=DB.parts.find(function(x){return x.id===t.partId;});
+      return [esc(t.id),esc(pdate(t.date)),t.type==="IN"?"Stock In":"Stock Out",
+        esc(p?p.name:t.partName),esc(p?p.code:t.partCode),qf(t.qty)+" "+esc(p?p.unit:t.unit||""),
+        esc(t.invoice||t.requisition||"—"),
+        t.type==="IN"?esc(t.supplier||"—"):esc(t.dept||"—"),
+        t.type==="IN"?esc(t.receivedBy||"—"):esc(t.issuedBy||"—"),
+        esc(t.remarks||"—")];
+    });
+    var iq=0,oq=0;
+    l.forEach(function(t){if(t.type==="IN")iq+=num(t.qty);else oq+=num(t.qty);});
+    printDoc("Transaction History",
+      '<div class="print-summary"><b>Transactions:</b> '+l.length+' | <b>Total In:</b> '+qf(iq)+' | <b>Total Out:</b> '+qf(oq)+'</div>'+
+      simpleTable(["Txn ID","Date","Type","Item","Code","Quantity","Reference","Department / Supplier","Person","Remarks"],rows));
+  });
+
+  // Alerts
+  $("#alPrt").addEventListener("click",function(){
+    var it=DB.parts.map(function(p){return {p:p,c:calc(p)};})
+      .filter(function(x){return x.c.st==="low"||x.c.st==="out";})
+      .sort(function(a,b){return a.c.cur-b.c.cur;});
+    var rows=it.map(function(x){
+      return [esc(x.p.id),esc(x.p.name),esc(x.p.code),esc(x.p.category||"—"),esc(x.p.location||"—"),
+        qf(x.c.cur)+" "+esc(x.p.unit),qf(x.p.minLevel),qf(suggest(x.p,x.c)),
+        x.c.st==="out"?"Out of Stock":"Low Stock",esc(x.p.supplier||"—")];
+    });
+    printDoc("Low Stock & Out of Stock Report",
+      '<div class="print-summary"><b>Items Needing Reorder:</b> '+it.length+'</div>'+
+      simpleTable(["ID","Item Name","Code","Category","Location","Current","Reorder","Suggested","Status","Supplier"],rows));
+  });
+  $("#alCsv").addEventListener("click",function(){
+    var it=DB.parts.map(function(p){return {p:p,c:calc(p)};})
+      .filter(function(x){return x.c.st==="low"||x.c.st==="out";});
+    if(!it.length){toast("No alerts to export.","error");return;}
+    var h=["Item ID","Item Name","Code","Category","Location","Current Stock","Unit","Reorder Level","Suggested Reorder","Status","Supplier"];
+    var rows=it.map(function(x){
+      return [x.p.id,x.p.name,x.p.code,x.p.category||"",x.p.location||"",
+        x.c.cur,x.p.unit,x.p.minLevel,suggest(x.p,x.c),
+        x.c.st==="out"?"Out of Stock":"Low Stock",x.p.supplier||""];
+    });
+    dl("low_stock_"+today()+".csv",toCSV(h,rows),"text/csv;charset=utf-8");
+    toast("Low stock CSV downloaded.","success");
+  });
+
+  // Reports
+  $("#repMonth").addEventListener("click",function(){$("#repFrom").value=firstMonth();$("#repTo").value=today();});
+  $("#repAll").addEventListener("click",function(){$("#repFrom").value="";$("#repTo").value="";});
+  $$("[data-rep]").forEach(function(b){b.addEventListener("click",function(){showRep(b.dataset.rep);});});
+  $("#repPrt").addEventListener("click",function(){
+    if(!lastRep)return;
+    printDoc(lastRep.title,lastRep.sum+simpleTable(lastRep.heads,lastRep.rows,lastRep.foot));
+  });
+  $("#repCsv").addEventListener("click",function(){
+    if(!lastRep)return;
+    var rows=lastRep.rows.map(function(r){
+      return r.map(function(c){return String(c).replace(/<[^>]*>/g,"");});
+    });
+    dl(lastRep.kind+"_report_"+today()+".csv",toCSV(lastRep.heads,rows),"text/csv;charset=utf-8");
+    toast("Report CSV downloaded.","success");
+  });
+
+  // Data
+  $("#bkBtn").addEventListener("click",expBackup);
+  $("#csvInv").addEventListener("click",expInvCsv);
+  $("#csvTxn").addEventListener("click",expTxnCsv);
+  $("#ldDemo").addEventListener("click",loadDemo);
+  $("#rmDemo").addEventListener("click",removeDemo);
+  $("#clrAll").addEventListener("click",clearAll);
+  $("#rsFile").addEventListener("change",function(){
+    if(this.files&&this.files[0]){restoreFile(this.files[0]);this.value="";}
+  });
+}
+
+/* ---------- Init ---------- */
+function init(){
+  load();
+  fixC();
+  rebuildTotals();
+  bind();
+  $("#inDate").value=today();
+  $("#outDate").value=today();
+  showView("dashboard");
+  refreshAll();
+  if(!DB.parts.length&&!DB.transactions.length){
+    setTimeout(function(){
+      toast("Welcome! Click 'Load Demo Data' in the Data & Backup page to explore, or add your first part.","success");
+    },800);
+  }
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);
+else init();
+</script>
+</body>
+</html>
